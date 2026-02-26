@@ -60,10 +60,7 @@ python differential_drive_sim.py
 ---
 
 ## 📷 Example Output
-
-(Insert simulation screenshot here)
-
----
+![Simulation Result](simulation_result.png)
 
 ## 🧠 Skills Demonstrated
 
