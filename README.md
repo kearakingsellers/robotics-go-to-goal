@@ -62,6 +62,26 @@ python differential_drive_sim.py
 ## 📷 Example Output
 ![Simulation Result](simulation_result.png)
 
+---
+
+## 🔧 Gain Tuning Analysis
+
+To analyze controller performance, the simulation was executed with different proportional gains:
+
+- k = 0.5
+- k = 1.0
+- k = 2.0
+
+### 📊 Observations
+
+- Lower gain (k = 0.5) results in slower convergence but smoother motion.
+- Medium gain (k = 1.0) provides balanced performance.
+- Higher gain (k = 2.0) reaches the goal faster but introduces sharper curvature.
+
+This demonstrates the trade-off between stability and responsiveness in proportional control systems used in mobile robotics.
+
+![Gain Comparison](gain_comparison.png)
+
 ## 🧠 Skills Demonstrated
 
 - Python programming

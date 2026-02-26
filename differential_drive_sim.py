@@ -1,65 +1,67 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+def simulate(k):
+    dt = 0.1
+    x, y, theta = 0.0, 0.0, 0.0
+    goal_x, goal_y = 5.0, 5.0
 
-class DifferentialDriveRobot:
-    def __init__(self, x=0.0, y=0.0, theta=0.0):
-        # State
-        self.x = x
-        self.y = y
-        self.theta = theta
+    trajectory_x = []
+    trajectory_y = []
 
-        # Trajectory storage
-        self.x_history = [x]
-        self.y_history = [y]
+    for _ in range(300):
 
-    def normalize_angle(self, angle):
-        return np.arctan2(np.sin(angle), np.cos(angle))
+        dx = goal_x - x
+        dy = goal_y - y
+        distance = np.sqrt(dx**2 + dy**2)
 
-    def update(self, v, omega, dt):
-        # Kinematic equations
-        self.x += v * np.cos(self.theta) * dt
-        self.y += v * np.sin(self.theta) * dt
-        self.theta += omega * dt
-        self.theta = self.normalize_angle(self.theta)
+        if distance < 0.1:
+            break
 
-        # Store trajectory
-        self.x_history.append(self.x)
-        self.y_history.append(self.y)
+        desired_theta = np.arctan2(dy, dx)
 
-    def go_to_goal(self, goal_x, goal_y, k=2.0, v=1.0, dt=0.1, tolerance=0.1):
-        while True:
-            dx = goal_x - self.x
-            dy = goal_y - self.y
+        # Angle error
+        angle_error = desired_theta - theta
 
-            distance = np.sqrt(dx**2 + dy**2)
-            if distance < tolerance:
-                break
+        # Normalize angle to [-pi, pi]
+        angle_error = np.arctan2(np.sin(angle_error), np.cos(angle_error))
 
-            desired_theta = np.arctan2(dy, dx)
-            error = self.normalize_angle(desired_theta - self.theta)
+        # Proportional controller
+        v = k * distance
+        w = k * angle_error
 
-            omega = k * error
-            self.update(v, omega, dt)
+        # Robot motion update
+        x += v * np.cos(theta) * dt
+        y += v * np.sin(theta) * dt
+        theta += w * dt
+
+        trajectory_x.append(x)
+        trajectory_y.append(y)
+
+    return trajectory_x, trajectory_y
 
 
-def plot_trajectory(robot, goal_x, goal_y):
-    plt.figure()
-    plt.plot(robot.x_history, robot.y_history)
-    plt.scatter(robot.x_history[0], robot.y_history[0])
-    plt.scatter(goal_x, goal_y)
-    plt.title("Differential Drive Robot - Go To Goal")
-    plt.xlabel("X Position")
-    plt.ylabel("Y Position")
-    plt.axis("equal")
-    plt.grid(True)
-    plt.show()
+# ===============================
+# Run simulations for different gains
+# ===============================
 
+gains = [0.5, 1.0, 2.0]
 
-if __name__ == "__main__":
-    robot = DifferentialDriveRobot(0, 0, 0)
-    goal_x = 5
-    goal_y = 5
+plt.figure()
 
-    robot.go_to_goal(goal_x, goal_y)
-    plot_trajectory(robot, goal_x, goal_y)
+for k in gains:
+    tx, ty = simulate(k)
+    plt.plot(tx, ty, label=f"k = {k}")
+
+# Plot goal point
+plt.scatter(5, 5)
+plt.xlabel("X Position")
+plt.ylabel("Y Position")
+plt.title("Go-To-Goal with Different Gains")
+plt.legend()
+plt.grid()
+
+# Save image
+plt.savefig("gain_comparison.png")
+
+plt.show()
